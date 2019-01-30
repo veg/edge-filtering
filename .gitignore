@@ -1,5 +1,6 @@
 ## ignoring the output in the data folder ##
-data/*
+data/sim_seq/*
+data/matrix/*
 
  Byte-compiled / optimized / DLL files
 __pycache__/

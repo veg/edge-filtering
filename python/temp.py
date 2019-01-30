@@ -1,12 +1,12 @@
-print('\n 		generating the matrix... \n' )
 import numpy as np
 import pandas as pd
 
 
 
 def matrix_maker(internal, tip, matrix_node_counts):
+	print('\n 		generating the matrix... \n' )
 	dfs = []
-	for i in matrix_node_counts[0:3]:
+	for i in matrix_node_counts:
 		nodes = list(range(i))
 		## payload for column 1 (node ID) ##
 		j = [i +1 for i in nodes]
@@ -26,6 +26,7 @@ def matrix_maker(internal, tip, matrix_node_counts):
 	return dfs 
 
 def matrix_writer(matrices):
+	print('\n 		writing the matrix to a file... \n' )
 	for i in matrices:
 		number = str(len(i))
 		filename =  ('../data/%s_nodes.csv' % number)
