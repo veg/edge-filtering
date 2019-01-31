@@ -6,8 +6,7 @@ dirname = os.path.dirname(os.path.realpath(__file__))
 
 def matrix_maker(internal, tip, matrix_node_count):
     print('\n         generating the matrix... \n' )
-    print(matrix_node_count)
-    nodes = list(range(matrix_node_count))
+    nodes = list(range(int(matrix_node_count)))
     ## payload for column 1 (node ID) ##
     j = [i +1 for i in nodes]
     print('Total number of  nodes in the network: ' + str(j[-1]) + '\n')
