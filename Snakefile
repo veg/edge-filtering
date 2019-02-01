@@ -1,17 +1,18 @@
 ## import all functions from python ## 
 from python.temp import *
-#import python.temp
-
-## declare variables, so in our case, files based on matrix node size ## 
 
 NODES = ["10", "50", "100", "200", "500", "1000", "10000"]
 #nodes=NODES
 #nodes='10'
 
+#### debugger:     #run: import pdb; pdb.set_trace() ####
+
 ## this rule colelcts the target file, this cannot contain wildcards ##
 ## and this 'all' rule must be at the top ## 
+
 rule all:
-    input: expand("data/matrix/{NODES}_nodes.ibf", NODES=NODES)
+    #input: expand("data/matrix/{NODES}_nodes.ibf", NODES=NODES)
+    input: expand("data/sim_seq/{node}_sim.fasta", node=NODES)
 
 
 ## this is a demo rule that will use the python script to make and write matrices ## 
@@ -23,24 +24,20 @@ rule matrix_for_BF:
     run: 
         for n in params.node_cnts:
             edge_creator(0.005,0, n, "hyphy")
-    # import pdb; pdb.set_trace(),
-    #"python {input.script} -c {NODES} -f 'hyphy'"
- #edge_creator(0.005,0,{nodes}, "hyphy")
 
+## this rule will take the matrices and input them into the sim_seq.bf to make fasta files ##
+rule seq_gen:
+    input:
+         "data/matrix/{NODES}_nodes.ibf"
+    output:
+        "data/sim_seq/{NODES}_sim.fasta"
+    shell:
+        "HYPHYMP simulate/SimulateSequence.bf {input} > {output}"
 
-# ## this rule will then traverse the file system and input the matrices into BF to simulate seqs ##
-# rule seq_gen:
+## this rule will take the generated fasta files and input them into HIVtrace 
+# rule hiv_trace:
 #     input:
-#         matrix=rules.matrix_for_BF.output.hyphy
-#     output:
-#         fasta="data/sim_seq/{node}_sim.fasta"
-#     shell:
-#         ## is there a way to use an input flag for hyphy so we can throw in the matrix file? ##
-#         HYPHYMP SimulateSequence.bf input.matrix
-
-# rule hyphy_analysis:
-#     input:
-#         seqs=rules.seq_gen.output.fasta
+#         "data/sim_seq/{NODES}_sim.fasta"
 #     output:
 #         json="data/hyphy/{node}.results.json"
 #     shell:
