@@ -52,6 +52,7 @@ def matrix_writer(matrix, format):
 def edge_creator(internal_length, tip_length, matrix_node_count, format):
     results = matrix_maker(internal_length,tip_length,matrix_node_count)
     matrix_writer(results, format)
+    return results
 
 def main():
 
