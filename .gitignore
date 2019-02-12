@@ -1,6 +1,5 @@
 ## ignoring the output in the data folder ##
-data/sim_seq/*
-data/matrix/*
+data
 .snakemake
 
  Byte-compiled / optimized / DLL files
