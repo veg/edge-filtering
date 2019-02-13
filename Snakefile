@@ -80,13 +80,14 @@ rule hiv_trace_without_edge:
 
 rule generate_edge_report:
     input:
-        results=expand("data/hivtrace/{nodes}_nodes.results.json", nodes=NODES)
+        results=expand("data/hivtrace/{nodes}_nodes.results.json", nodes=NODES),
+        no_filter=expand("data/hivtrace/{nodes}_nodes.nofilter.results.json", nodes=NODES)
     params:
         transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,n) for n in NODES]
     output:
         expand("data/hivtrace/{nodes}_edge_report.json", nodes=NODES)
     run:
-        pairs = zip(input.results, params.transmission_chains, output)
+        pairs = zip(input.results, input.no_filter, params.transmission_chains, output)
         for p in pairs:
             edge_report(*p)
 

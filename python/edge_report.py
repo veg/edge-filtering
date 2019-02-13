@@ -1,13 +1,19 @@
 import json
 
-def edge_report(results_json, transmission_chain, output_fn):
+def edge_report(results_json, no_filter_json, transmission_chain, output_fn):
 
     results = ''
+    no_filter_results = ''
 
     with open(results_json) as f:
         results = json.loads(f.read())
 
+    with open(no_filter_json) as f:
+        no_filter_results = json.loads(f.read())
+
+
     results = results["trace_results"]
+    no_filter_results = no_filter_results["trace_results"]
 
     report = {}
 
@@ -18,8 +24,11 @@ def edge_report(results_json, transmission_chain, output_fn):
     num_edges = results["Network Summary"]["Edges"]
     num_nodes = results["Network Summary"]["Nodes"]
 
+    num_edges_removed = no_filter_results["Network Summary"]["Edges"] - num_edges
+
     report['num_edges'] = num_edges
     report['num_nodes'] = num_nodes
+    report['num_edges_removed'] = num_edges_removed
 
     # Do the number of edges equal N - 1?
     expected_num_edges = (num_nodes - num_edges) == 1
