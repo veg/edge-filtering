@@ -1,7 +1,10 @@
 ## import all functions from python ## 
 from python.temp import *
 from python.edge_report import edge_report
+import itertools
 
+
+#NODES = list(itertools.repeat("10", 10))
 NODES = ["10", "50", "100", "200", "500", "1000", "10000"]
 #nodes=NODES
 #nodes='10'
@@ -17,7 +20,7 @@ FORMAT = "hyphy"
 ## and this 'all' rule must be at the top ## 
 
 def expand_all(*args, **wildcards):
-  return expand("data/hivtrace/{node}_nodes.results.json", node=wildcards["node"]) + expand("data/hivtrace/{node}_nodes.nofilter.results.json",node=wildcards["node"])
+    return expand("data/hivtrace/{node}_nodes.results.json", node=wildcards["node"]) + expand("data/hivtrace/{node}_nodes.nofilter.results.json",node=wildcards["node"])
 
 rule all: 
     #input: expand_all("", node=NODES)
@@ -38,7 +41,7 @@ rule matrix_for_BF:
     params: 
         node_cnts = expand("{node}", node=NODES)
     output: 
-        expand("data/matrix/{NODES}_nodes.ibf", NODES=NODES),
+        expand("data/matrix/{nodes}_nodes.ibf", nodes=NODES),
     run: 
         for n in params.node_cnts:
             edge_creator(INTERNAL_LENGTH,TIP_LENGTH, n, FORMAT)
@@ -84,8 +87,6 @@ rule generate_edge_report:
         expand("data/hivtrace/{nodes}_edge_report.json", nodes=NODES)
     run:
         pairs = zip(input.results, params.transmission_chains, output)
-        import pdb;pdb.set_trace()
-
         for p in pairs:
             edge_report(*p)
 

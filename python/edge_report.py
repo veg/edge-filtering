@@ -34,6 +34,9 @@ def edge_report(results_json, transmission_chain, output_fn):
     # Edges in hivtrace results match what is expected
     report['edges_equals_expected'] = edges == expected_edges
 
+    if not report['edges_equals_expected']:
+        report["spurious_edges"] = [e for e in edges if e not in expected_edges]
+
     with open(output_fn, 'w') as jsonfile:
         json.dump(report, jsonfile)
 
