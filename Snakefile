@@ -2,92 +2,77 @@
 from python.temp import *
 from python.edge_report import edge_report
 import itertools
+import os
 
 
 #NODES = list(itertools.repeat("10", 10))
 NODES = ["10", "50", "100", "200", "500", "1000", "10000"]
-#nodes=NODES
-#nodes='10'
+INDEX = [str(pos) for pos, item in enumerate(NODES)]
+PAIRS = list(zip(NODES,INDEX))
 
+temp = [p[0]+'_'+p[1] for p in PAIRS]
 
 INTERNAL_LENGTH = 0.005
 TIP_LENGTH = 0
 FORMAT = "hyphy"
 
-#### debugger:     #run: import pdb; pdb.set_trace() ####
-
-## this rule collects the target file, this cannot contain wildcards ##
-## and this 'all' rule must be at the top ## 
-
-def expand_all(*args, **wildcards):
-    return expand("data/hivtrace/{node}_nodes.results.json", node=wildcards["node"]) + expand("data/hivtrace/{node}_nodes.nofilter.results.json",node=wildcards["node"])
+# def expand_all(*args, **wildcards):
+#     return expand("data/hivtrace/{node}_nodes.results.json", node=wildcards["node"]) + expand("data/hivtrace/{node}_nodes.nofilter.results.json",node=wildcards["node"])
 
 rule all: 
+    input: expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
     #input: expand_all("", node=NODES)
-    input:  expand("data/hivtrace/{node}_edge_report.json", node=NODES)
-
-    ## use this if you want to just check rule 'matrix_for_BF' ##
-    #input: expand("./data/matrix/{NODES}_nodes.ibf", NODES=NODES)
-    
-    ## use this if you want to just check rule 'seq_gen' ##
-    #input: expand("./data/sim_seq/{node}_sim.fasta", node=NODES)
-
-    ## use this if you want to just check rule 'hiv_trace' ##
-    #input: expand("data/hivtrace/{node}_nodes.results.json", node=NODES)
-
 
 ## this rule that will use the python script to make and write matrices to .ibf files ## 
 rule matrix_for_BF:
     params: 
-        node_cnts = expand("{node}", node=NODES)
+        temp=temp
     output: 
-        expand("data/matrix/{nodes}_nodes.ibf", nodes=NODES),
-    run: 
-        for n in params.node_cnts:
-            edge_creator(INTERNAL_LENGTH,TIP_LENGTH, n, FORMAT)
+        expand("data/matrix/{temp}_nodes.ibf", temp=temp)
+    run:
+        for pair in zip(params.temp,output):
+            node = pair[0].split('_')[0]
+            output_fn = pair[1]
+            edge_creator(INTERNAL_LENGTH, TIP_LENGTH, node, FORMAT, output_fn)
 
 ## this rule will take the matrices and input them into the sim_seq.bf to make fasta files ##
 rule seq_gen:
     input:
-        "data/matrix/{NODES}_nodes.ibf"
+        os.path.join(os.getcwd(), "data/matrix/{temp}_nodes.ibf")
     output:
-        "data/sim_seq/{NODES}_sim.fasta"
-    params:
-        in_path=os.getcwd() + "/" + "data/matrix/{NODES}_nodes.ibf",
-        out_path=os.getcwd()+ "/" +  "data/sim_seq/{NODES}_sim.fasta"
-    shell:
-        "HYPHYMP simulate/SimulateSequence.bf {params.in_path} > {params.out_path}"
+        "data/sim_seq/{temp}_sim.fasta"
+    shell:  
+        "HYPHYMP simulate/SimulateSequence.bf {input} > {output}"
+
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace:
     input:
-        "data/sim_seq/{NODES}_sim.fasta"
+        rules.seq_gen.output
     output:
-        "data/hivtrace/{NODES}_nodes.results.json"
+        "data/hivtrace/{temp}_nodes.results.json"
     shell:
-        # this is giving me an odd error message, CalledProcessError ?? is this a me or hivtrace thing? #
         "hivtrace -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_without_edge:
     input:
-        "data/sim_seq/{NODES}_sim.fasta"
+        rules.seq_gen.output
     output:
-        "data/hivtrace/{NODES}_nodes.nofilter.results.json"
+        "data/hivtrace/{temp}_nodes.nofilter.results.json"
     shell:
-        # this is giving me an odd error message, CalledProcessError ?? is this a me or hivtrace thing? #
         "hivtrace -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
 rule generate_edge_report:
     input:
-        results=expand("data/hivtrace/{nodes}_nodes.results.json", nodes=NODES),
-        no_filter=expand("data/hivtrace/{nodes}_nodes.nofilter.results.json", nodes=NODES)
+        wit=rules.hiv_trace.output,
+        wit_oot=rules.hiv_trace_without_edge.output
     params:
         transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,n) for n in NODES]
     output:
-        expand("data/hivtrace/{nodes}_edge_report.json", nodes=NODES)
+        "data/hivtrace/{temp}_edge_report.json"
     run:
-        pairs = zip(input.results, input.no_filter, params.transmission_chains, output)
+        pairs = zip(input.wit, input.wit_oot, params.transmission_chains, output)
         for p in pairs:
             edge_report(*p)
 
