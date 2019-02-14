@@ -46,6 +46,10 @@ def edge_report(results_json, no_filter_json, transmission_chain, output_fn):
     if not report['edges_equals_expected']:
         report["spurious_edges"] = [e for e in edges if e not in expected_edges]
 
+    wrongfully_purged = [e for e in expected_edges if e not in edges]
+
+    report['wrongfully_purged_edges'] = wrongfully_purged
+
     with open(output_fn, 'w') as jsonfile:
         json.dump(report, jsonfile)
 

@@ -6,7 +6,7 @@ import os
 
 
 #NODES = list(itertools.repeat("10", 10))
-NODES = ["10", "50", "100", "200", "500", "1000", "10000"]
+NODES = ["10", "50", "100", "200", "500", "1000"]
 INDEX = [str(pos) for pos, item in enumerate(NODES)]
 PAIRS = list(zip(NODES,INDEX))
 
