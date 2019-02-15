@@ -67,12 +67,11 @@ rule generate_edge_report:
     input:
         wit=rules.hiv_trace.output,
         wit_oot=rules.hiv_trace_without_edge.output
-    params:
-        transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,n) for n in NODES]
     output:
         "data/hivtrace/{temp}_edge_report.json"
     run:
-        pairs = zip(input.wit, input.wit_oot, params.transmission_chains, output)
+        transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,int(n.split('/')[2].split('_')[0])) for n in input.wit]
+        pairs = zip(input.wit, input.wit_oot, transmission_chains, output)
         for p in pairs:
             edge_report(*p)
 
