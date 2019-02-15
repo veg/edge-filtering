@@ -6,7 +6,7 @@ import os
 
 
 #NODES = list(itertools.repeat("10", 10))
-NODES = ["10", "50", "100", "200", "500", "1000"]
+NODES = ["10", "20", "30", "40", "50", "60", "150"]
 INDEX = [str(pos) for pos, item in enumerate(NODES)]
 PAIRS = list(zip(NODES,INDEX))
 
@@ -28,7 +28,7 @@ rule matrix_for_BF:
     params: 
         temp=temp
     output: 
-        expand("data/matrix/{temp}_nodes.ibf", temp=temp)
+        expand(os.path.join(os.getcwd(),"data/matrix/{temp}_nodes.ibf"), temp=temp)
     run:
         for pair in zip(params.temp,output):
             node = pair[0].split('_')[0]
