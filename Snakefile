@@ -1,36 +1,46 @@
 ## import all functions from python ## 
 from python.temp import *
 from python.edge_report import edge_report
-from python.sum_stats import sum_stats
+from python.sum_stats_table import sum_stats_table
+from python.graph import sum_stats_graph
 import itertools
 import os
 #import json
 
 
-#NODES = list(itertools.repeat("10", 10))
-#NODES = ["10", "20", "30", "40", "50", "60", "150"]
-#NODES = list(range(10, 301, 10))
-NODES = [70]*10
-INDEX = [str(pos) for pos, item in enumerate(NODES)]
-PAIRS = list(zip(NODES,INDEX))
+# size of the networks to create #
+network_sizes = list(range(3, 21))
 
-temp = [str(p[0])+'_'+p[1] for p in PAIRS]
-
-INTERNAL_LENGTH = 0.005
+# Evolution parameters #
+    #within host Ev #
 TIP_LENGTH = 0
+    #between host Ev #
+INTERNAL_LENGTH = 0.05
 FORMAT = "hyphy"
 
-# def expand_all(*args, **wildcards):
-#     return expand("data/hivtrace/{node}_nodes.results.json", node=wildcards["node"]) + expand("data/hivtrace/{node}_nodes.nofilter.results.json",node=wildcards["node"])
+# number of simulations #
+sims = 10
+number_of_sims = [[i]*sims for i in network_sizes]
+flatten = [j for i in number_of_sims for j in i]
+
+INDEX = []
+for i in number_of_sims:
+    for pos, item in enumerate(i):
+        INDEX.append(str(pos))
+
+PAIRS = list(zip(flatten,INDEX))
+temp = [str(p[0])+'_'+p[1] for p in PAIRS]
+
+
 
 rule all: 
-    input:
-        "data/percent_edge_removal_graph.png",
-        "data/false_rates_graph.png",
-        "data/true_rates_graph.png",
-        "data/summary_statistics_table.csv"
-    #expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
-    #input: expand_all("", node=NODES)
+    input:        
+        "data/summary_statistics_FDR_graph.png",
+        "data/summary_statistics_TDR_graph.png",
+        "data/summary_statistics_funnel_graph.png",
+        "data/summary_statistics_sqrt_funnel_graph.png"
+        #"data/summary_statistics_table.csv"
+
 
 ## this rule that will use the python script to make and write matrices to .ibf files ## 
 rule matrix_for_BF:
@@ -39,6 +49,7 @@ rule matrix_for_BF:
     output: 
         expand(os.path.join(os.getcwd(),"data/matrix/{temp}_nodes.ibf"), temp=temp)
     run:
+        #import pdb; pdb.set_trace()
         for pair in zip(params.temp,output):
             node = pair[0].split('_')[0]
             output_fn = pair[1]
@@ -93,18 +104,26 @@ rule generate_edge_report:
 #     script:
 #         "{input}"
 
-
-rule summary_stats:
+## this rule consumes all the edge reports and creates a table with all the info ##
+rule summary_stats_table:
     input:
         expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
     output:
-        "data/percent_edge_removal_graph.png",
-        "data/false_rates_graph.png",
-        "data/true_rates_graph.png",
         "data/summary_statistics_table.csv"
     run:
-        #import pdb; pdb.set_trace()
-        sum_stats({input}, output[0], output[1], output[2], output[3])
+        sum_stats_table(input, output, sims)
+
+## this rule consumes all the edge reports and creates FDR, TDR, and funnel graphs with all the info ##
+rule summary_stats_graph:
+    input:
+        rules.summary_stats_table.output
+    output:
+        "data/summary_statistics_FDR_graph.png",
+        "data/summary_statistics_TDR_graph.png",
+        "data/summary_statistics_funnel_graph.png",
+        "data/summary_statistics_sqrt_funnel_graph.png"
+    run:
+        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
 
 
 
