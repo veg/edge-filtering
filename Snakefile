@@ -7,6 +7,7 @@ import itertools
 import os
 #import json
 
+shell.prefix("module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
 
 # size of the networks to create #
 network_sizes = list(range(3, 21))
@@ -45,9 +46,11 @@ rule all:
 ## this rule that will use the python script to make and write matrices to .ibf files ## 
 rule matrix_for_BF:
     params: 
-        temp=temp
+        temp=temp,
+        runtime="5:00:00"
     output: 
         expand(os.path.join(os.getcwd(),"data/matrix/{temp}_nodes.ibf"), temp=temp)
+    group:"matrix_generation"
     run:
         #import pdb; pdb.set_trace()
         for pair in zip(params.temp,output):
@@ -57,16 +60,21 @@ rule matrix_for_BF:
 
 ## this rule will take the matrices and input them into the sim_seq.bf to make fasta files ##
 rule seq_gen:
+    params:
+        runtime="5:00:00"
     input:
         os.path.join(os.getcwd(), "data/matrix/{temp}_nodes.ibf")
     output:
         "data/sim_seq/{temp}_sim.fasta"
+    group:"hivtrace"
     shell:  
         "HYPHYMP simulate/SimulateSequence.bf {input} > {output}"
 
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_with_edge_filtering:
+    params:
+        runtime="5:00:00"
     input:
         rules.seq_gen.output
     output:
@@ -76,6 +84,8 @@ rule hiv_trace_with_edge_filtering:
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_without_edge_filtering:
+    params:
+        runtime="5:00:00"
     input:
         rules.seq_gen.output
     output:
@@ -84,11 +94,14 @@ rule hiv_trace_without_edge_filtering:
         "hivtrace -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
 rule generate_edge_report:
+    params:
+        runtime="5:00:00"
     input:
         with_edge_filtering=rules.hiv_trace_with_edge_filtering.output,
         with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output
     output:
         "data/hivtrace/{temp}_edge_report.json"
+    group:"hivtrace"
     run:
         transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,int(n.split('/')[2].split('_')[0])) for n in input.with_edge_filtering]
         pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, transmission_chains, output)
@@ -106,15 +119,20 @@ rule generate_edge_report:
 
 ## this rule consumes all the edge reports and creates a table with all the info ##
 rule summary_stats_table:
+    params:
+        runtime="5:00:00"
     input:
         expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
     output:
         "data/summary_statistics_table.csv"
+    group:"hivtrace"
     run:
         sum_stats_table(input, output, sims)
 
 ## this rule consumes all the edge reports and creates FDR, TDR, and funnel graphs with all the info ##
 rule summary_stats_graph:
+    params:
+        runtime="5:00:00"
     input:
         rules.summary_stats_table.output
     output:
@@ -122,6 +140,7 @@ rule summary_stats_graph:
         "data/summary_statistics_TDR_graph.png",
         "data/summary_statistics_funnel_graph.png",
         "data/summary_statistics_sqrt_funnel_graph.png"
+    group:"hivtrace"
     run:
         sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
 
