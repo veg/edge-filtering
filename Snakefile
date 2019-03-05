@@ -7,7 +7,7 @@ import itertools
 import os
 #import json
 
-shell.prefix("module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
+shell.prefix("source /home/sweaver/programming/hivtrace/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
 
 # size of the networks to create #
 network_sizes = list(range(3, 21))
@@ -35,6 +35,8 @@ temp = [str(p[0])+'_'+p[1] for p in PAIRS]
 
 
 rule all: 
+    params: 
+        runtime="5:00:00"
     input:        
         "data/summary_statistics_FDR_graph.png",
         "data/summary_statistics_TDR_graph.png",
@@ -66,7 +68,7 @@ rule seq_gen:
         os.path.join(os.getcwd(), "data/matrix/{temp}_nodes.ibf")
     output:
         "data/sim_seq/{temp}_sim.fasta"
-    group:"hivtrace"
+    group:"matrix_generation"
     shell:  
         "HYPHYMP simulate/SimulateSequence.bf {input} > {output}"
 
@@ -79,6 +81,7 @@ rule hiv_trace_with_edge_filtering:
         rules.seq_gen.output
     output:
         "data/hivtrace/{temp}_nodes.results.json"
+    group:"hivtrace"
     shell:
         "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
@@ -90,6 +93,7 @@ rule hiv_trace_without_edge_filtering:
         rules.seq_gen.output
     output:
         "data/hivtrace/{temp}_nodes.nofilter.results.json"
+    group:"hivtrace"
     shell:
         "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
@@ -101,7 +105,7 @@ rule generate_edge_report:
         with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output
     output:
         "data/hivtrace/{temp}_edge_report.json"
-    group:"hivtrace"
+    group:"report"
     run:
         transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,int(n.split('/')[2].split('_')[0])) for n in input.with_edge_filtering]
         pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, transmission_chains, output)
@@ -125,7 +129,7 @@ rule summary_stats_table:
         expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
     output:
         "data/summary_statistics_table.csv"
-    group:"hivtrace"
+    group:"report"
     run:
         sum_stats_table(input, output, sims)
 
@@ -140,7 +144,7 @@ rule summary_stats_graph:
         "data/summary_statistics_TDR_graph.png",
         "data/summary_statistics_funnel_graph.png",
         "data/summary_statistics_sqrt_funnel_graph.png"
-    group:"hivtrace"
+    group:"report"
     run:
         sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
 
