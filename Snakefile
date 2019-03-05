@@ -80,7 +80,7 @@ rule hiv_trace_with_edge_filtering:
     output:
         "data/hivtrace/{temp}_nodes.results.json"
     shell:
-        "hivtrace -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_without_edge_filtering:
@@ -91,7 +91,7 @@ rule hiv_trace_without_edge_filtering:
     output:
         "data/hivtrace/{temp}_nodes.nofilter.results.json"
     shell:
-        "hivtrace -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
 rule generate_edge_report:
     params:
