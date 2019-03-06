@@ -1,5 +1,21 @@
 import json
 
+def get_json(fn):
+    with open(fn) as f:
+        return json.loads(f.read())
+
+def consolidate_edge_reports(pairs, input, output):
+
+    report = {}
+    # for each edge report, create key based on filename
+    for pair, fn in zip(pairs, input):
+        report[pair] = get_json(fn)
+
+    with open(output, 'w') as jsonfile:
+        json.dump(report, jsonfile)
+
+    return
+
 def generate_edge_report(test_filter_results, no_filter_results, transmission_chain):
 
     report = {}

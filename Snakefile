@@ -1,6 +1,6 @@
 ## import all functions from python ## 
 from python.temp import *
-from python.edge_report import edge_report
+from python.edge_report import edge_report, consolidate_edge_reports
 from python.sum_stats_table import sum_stats_table
 from python.graph import sum_stats_graph
 import itertools
@@ -137,6 +137,17 @@ rule generate_edge_report:
 #         "{input}"
 
 ## this rule consumes all the edge reports and creates a table with all the info ##
+rule generate_all_edge_report:
+    params:
+        runtime="5:00:00"
+    input:
+        expand("data/hivtrace/{temp}_edge_report.json", temp=temp)
+    output:
+        "data/all_edge_report.json"
+    group:"report"
+    run:
+        consolidate_edge_reports(temp, input, output[0])
+
 rule summary_stats_table:
     params:
         runtime="5:00:00"
