@@ -123,7 +123,7 @@ rule generate_edge_report:
     group:"report"
     run:
         transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,int(n.split('/')[2].split('_')[0])) for n in input.with_edge_filtering]
-        pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, transmission_chains, output)
+        pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, [input.with_cycle_filtering[0]], [input.with_cycle_filtering[1]], transmission_chains, output)
         for p in pairs:
             edge_report(*p)
 

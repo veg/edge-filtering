@@ -1,5 +1,5 @@
 '''
-want to: 
+want to:
     1. expand on the input, read in a list of the reports
     2. from each file:
         a. total number of nodes
@@ -7,7 +7,7 @@ want to:
         c. grab number of edges removed
         d. number of wrongfully purged edges
         e. number of spurious edges still remaining
-    3. make a graph that shows 
+    3. make a graph that shows
 '''
 
 import json
@@ -28,7 +28,7 @@ def sum_stats_table(input, output, sims):
     def chunk(lst, chunk_size):
         for i in range(0, len(lst), chunk_size):
             yield lst[i:i+ chunk_size]
-    
+
     chunked = list(chunk(input,sims))
 
     avg_FNR = []
@@ -50,6 +50,7 @@ def sum_stats_table(input, output, sims):
             with open(file) as f:
                 data = json.load(f)
             #pprint(data)
+            data = data['filter-report']
             nodes.append(data['num_nodes'])
             total_edges_before_filter.append(int(data['num_edges']) + int(data['num_edges_removed']))
             current_edges.append(int(data['num_edges']))
@@ -60,12 +61,12 @@ def sum_stats_table(input, output, sims):
                 spurious_still_remaining.append(0)
             else:
                 spurious_still_remaining.append(len(data['spurious_edges']))
-    
+
         TP = edges_removed
         ER_avg = sum(edges_removed)/len(edges_removed)
         FN = spurious_still_remaining
         FNR = [int(a) / (int(a) + int(b)) for a,b in zip(FN, TP)]
-    
+
         # FPR = FP/ (FP + TN)
         FP = wrongfully_purged_edges
         TN = true_negatives
@@ -80,14 +81,14 @@ def sum_stats_table(input, output, sims):
         TPR_avg = sum(TPR)/len(TPR)
         TNR = [(1-i) for i in FPR]
         TNR_avg = sum(TNR)/len(TNR)
-        
+
         avg_FNR.append(sum(FNR)/len(FNR))
         avg_FPR.append(sum(FPR)/len(FPR))
         avg_TPR.append(sum(TPR)/len(TPR))
         avg_TNR.append(sum(TNR)/len(TNR))
         avg_ER.append(sum(edges_removed)/len(edges_removed))
 
-    
+
 
     list_nodes = list(set(nodes))
     NM1 = [i-1 for i in list_nodes]
@@ -95,7 +96,7 @@ def sum_stats_table(input, output, sims):
 
     table_vals = np.array((avg_FNR, avg_FPR, avg_TNR, avg_TPR, avg_ER, NM1, max_con ), dtype=None)
     table = pd.DataFrame(table_vals, index=['avg_FNR','avg_FPR','avg_TNR','avg_TPR', 'avg_ER','NM1','max_con'])
-    
+
     table.columns = list_nodes
     table.to_csv(str(output))
     #total_nodes_index = [pos for pos, item in enumerate(total_nodes)]
