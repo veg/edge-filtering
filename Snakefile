@@ -42,7 +42,8 @@ rule all:
         "data/summary_statistics_FDR_graph.png",
         "data/summary_statistics_TDR_graph.png",
         "data/summary_statistics_funnel_graph.png",
-        "data/summary_statistics_sqrt_funnel_graph.png"
+        "data/summary_statistics_sqrt_funnel_graph.png",
+        "data/all_edge_report.json"
         #"data/summary_statistics_table.csv"
 
 
