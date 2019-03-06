@@ -11,6 +11,7 @@ shell.prefix("source /home/sweaver/programming/hivtrace/edge/bin/activate;module
 
 # size of the networks to create #
 network_sizes = list(range(3, 21))
+#network_sizes = list([20])
 
 # Evolution parameters #
     #within host Ev #
@@ -97,12 +98,26 @@ rule hiv_trace_without_edge_filtering:
     shell:
         "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
 
+## this rule will take the generated fasta files and input them into HIVtrace 
+rule hiv_trace_with_cycle_filtering:
+    params:
+        runtime="5:00:00"
+    input:
+        rules.seq_gen.output
+    output:
+        "data/hivtrace/{temp}_nodes.cycle.results.json", "data/hivtrace/{temp}_nodes.cycle_report.json"
+    group:"hivtrace"
+    shell:
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]}"
+
+
 rule generate_edge_report:
     params:
         runtime="5:00:00"
     input:
         with_edge_filtering=rules.hiv_trace_with_edge_filtering.output,
-        with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output
+        with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output,
+        with_cycle_filtering=rules.hiv_trace_with_cycle_filtering.output
     output:
         "data/hivtrace/{temp}_edge_report.json"
     group:"report"
@@ -147,7 +162,4 @@ rule summary_stats_graph:
     group:"report"
     run:
         sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
-
-
-
 

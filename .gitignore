@@ -1,6 +1,7 @@
 ## ignoring the output in the data folder ##
 data
 .snakemake
+snakejob*
 hivtrace
 
  Byte-compiled / optimized / DLL files

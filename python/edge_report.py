@@ -4,7 +4,7 @@ def edge_report(results_json, no_filter_json, transmission_chain, output_fn):
 
     ## has been filtered ##
     results = ''
-    
+
     ## has NOT been filtered ##
     no_filter_results = ''
 
@@ -28,7 +28,7 @@ def edge_report(results_json, no_filter_json, transmission_chain, output_fn):
     num_edges = results["Network Summary"]["Edges"]
     num_nodes = results["Network Summary"]["Nodes"]
 
-    ## this IS the number of edges removed BY edge filtering, 
+    ## this IS the number of edges removed BY edge filtering,
     ## but NOT the true number of total edges that should have been removed...
     ## ... if we were to compare back to the original TRUTH of the CT
 
@@ -62,7 +62,7 @@ def edge_report(results_json, no_filter_json, transmission_chain, output_fn):
         ## False positives ##
         report["spurious_edges"] = [e for e in edges if e not in expected_edges]
 
-    ## Remember this is the False Negative!! ## 
+    ## Remember this is the False Negative!! ##
     wrongfully_purged = [e for e in expected_edges if e not in edges]
 
     report['wrongfully_purged_edges'] = wrongfully_purged
