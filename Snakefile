@@ -5,9 +5,13 @@ from python.sum_stats_table import sum_stats_table
 from python.graph import sum_stats_graph
 import itertools
 import os
+import datetime as dt
 #import json
 
-shell.prefix("source /home/sweaver/programming/hivtrace/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
+shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
+
+# use the time to organize runs
+time = str(dt.datetime.now()).split(' ')[0]
 
 # size of the networks to create #
 network_sizes = list(range(3, 21))
@@ -82,10 +86,10 @@ rule hiv_trace_with_edge_filtering:
     input:
         rules.seq_gen.output
     output:
-        "data/hivtrace/{temp}_nodes.results.json"
+        "data/hivtrace/{temp}_nodes.results.json", "data/hivtrace/{temp}_nodes.results.log"
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]}"
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_without_edge_filtering:
@@ -94,10 +98,10 @@ rule hiv_trace_without_edge_filtering:
     input:
         rules.seq_gen.output
     output:
-        "data/hivtrace/{temp}_nodes.nofilter.results.json"
+        "data/hivtrace/{temp}_nodes.nofilter.results.json", "data/hivtrace/{temp}_nodes.nofilter.results.log"
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]} "
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_with_cycle_filtering:
@@ -106,10 +110,10 @@ rule hiv_trace_with_cycle_filtering:
     input:
         rules.seq_gen.output
     output:
-        "data/hivtrace/{temp}_nodes.cycle.results.json", "data/hivtrace/{temp}_nodes.cycle_report.json"
+        "data/hivtrace/{temp}_nodes.cycle.results.json", "data/hivtrace/{temp}_nodes.cycle_report.json", "data/hivtrace/{temp}_nodes.cycle.results.log"
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]} --log {output[2]}"
 
 
 rule generate_edge_report:
