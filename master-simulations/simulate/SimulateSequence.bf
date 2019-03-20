@@ -125,10 +125,9 @@ Tree T = str;
 nuc_chars = {{"A","C","G","T"}{"1","","",""}};
 rate_count = Columns (rate_values);
 
-sim_strings      = {};
+sim_strings = {};
 
 branch_names = BranchName (T,-1);
-
 
 for (ri = 0; ri < rate_count; ri += 1) {
     
