@@ -14,7 +14,7 @@ shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.
 time = str(dt.datetime.now()).split(' ')[0]
 
 # size of the networks to create #
-network_sizes = list(range(3, 21))
+network_sizes = list(range(5, 6))
 #network_sizes = list([20])
 
 # Evolution parameters #
@@ -25,7 +25,7 @@ INTERNAL_LENGTH = 0.05
 FORMAT = "hyphy"
 
 # number of simulations #
-sims = 10
+sims = 1
 number_of_sims = [[i]*sims for i in network_sizes]
 flatten = [j for i in number_of_sims for j in i]
 

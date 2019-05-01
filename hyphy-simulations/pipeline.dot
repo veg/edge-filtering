@@ -2,152 +2,26 @@ digraph snakemake_dag {
     graph[bgcolor=white, margin=0];
     node[shape=box, style=rounded, fontname=sans,                 fontsize=10, penwidth=2];
     edge[penwidth=2, color=grey];
-	0[label = "all", color = "0.53 0.6 0.85", style="rounded"];
-	1[label = "summary_stats_graph", color = "0.07 0.6 0.85", style="rounded"];
-	2[label = "generate_all_edge_report", color = "0.00 0.6 0.85", style="rounded"];
-	3[label = "summary_stats_table", color = "0.13 0.6 0.85", style="rounded"];
-	4[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	5[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	6[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	7[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	8[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	9[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	10[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	11[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	12[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	13[label = "generate_edge_report", color = "0.33 0.6 0.85", style="rounded,dashed"];
-	14[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	15[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	16[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	17[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	18[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	19[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	20[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	21[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	22[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	23[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	24[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	25[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	26[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	27[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	28[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	29[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	30[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	31[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	32[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	33[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	34[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	35[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	36[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	37[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	38[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	39[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	40[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	41[label = "hiv_trace_with_edge_filtering", color = "0.27 0.6 0.85", style="rounded,dashed"];
-	42[label = "hiv_trace_without_edge_filtering", color = "0.20 0.6 0.85", style="rounded,dashed"];
-	43[label = "hiv_trace_with_cycle_filtering", color = "0.60 0.6 0.85", style="rounded,dashed"];
-	44[label = "seq_gen\ntemp: 5_0", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	45[label = "seq_gen\ntemp: 5_1", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	46[label = "seq_gen\ntemp: 5_2", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	47[label = "seq_gen\ntemp: 5_3", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	48[label = "seq_gen\ntemp: 5_4", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	49[label = "seq_gen\ntemp: 5_5", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	50[label = "seq_gen\ntemp: 5_6", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	51[label = "seq_gen\ntemp: 5_7", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	52[label = "seq_gen\ntemp: 5_8", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	53[label = "seq_gen\ntemp: 5_9", color = "0.40 0.6 0.85", style="rounded,dashed"];
-	54[label = "matrix_for_BF", color = "0.47 0.6 0.85", style="rounded,dashed"];
+	0[label = "all", color = "0.13 0.6 0.85", style="rounded"];
+	1[label = "summary_stats_graph", color = "0.60 0.6 0.85", style="rounded"];
+	2[label = "generate_all_edge_report", color = "0.40 0.6 0.85", style="rounded"];
+	3[label = "summary_stats_table", color = "0.27 0.6 0.85", style="rounded"];
+	4[label = "generate_edge_report", color = "0.47 0.6 0.85", style="rounded,dashed"];
+	5[label = "hiv_trace_with_edge_filtering", color = "0.00 0.6 0.85", style="rounded,dashed"];
+	6[label = "hiv_trace_without_edge_filtering", color = "0.33 0.6 0.85", style="rounded,dashed"];
+	7[label = "hiv_trace_with_cycle_filtering", color = "0.07 0.6 0.85", style="rounded,dashed"];
+	8[label = "seq_gen\ntemp: 5_0", color = "0.53 0.6 0.85", style="rounded,dashed"];
+	9[label = "matrix_for_BF", color = "0.20 0.6 0.85", style="rounded,dashed"];
 	1 -> 0
 	2 -> 0
 	3 -> 1
 	4 -> 2
-	5 -> 2
-	6 -> 2
-	7 -> 2
-	8 -> 2
-	9 -> 2
-	10 -> 2
-	11 -> 2
-	12 -> 2
-	13 -> 2
 	4 -> 3
-	5 -> 3
-	6 -> 3
-	7 -> 3
-	8 -> 3
-	9 -> 3
-	10 -> 3
-	11 -> 3
-	12 -> 3
-	13 -> 3
-	14 -> 4
-	15 -> 4
-	16 -> 4
-	17 -> 5
-	18 -> 5
-	19 -> 5
-	20 -> 6
-	21 -> 6
-	22 -> 6
-	23 -> 7
-	24 -> 7
-	25 -> 7
-	26 -> 8
-	27 -> 8
-	28 -> 8
-	29 -> 9
-	30 -> 9
-	31 -> 9
-	32 -> 10
-	33 -> 10
-	34 -> 10
-	35 -> 11
-	36 -> 11
-	37 -> 11
-	38 -> 12
-	39 -> 12
-	40 -> 12
-	41 -> 13
-	42 -> 13
-	43 -> 13
-	44 -> 14
-	44 -> 15
-	44 -> 16
-	45 -> 17
-	45 -> 18
-	45 -> 19
-	46 -> 20
-	46 -> 21
-	46 -> 22
-	47 -> 23
-	47 -> 24
-	47 -> 25
-	48 -> 26
-	48 -> 27
-	48 -> 28
-	49 -> 29
-	49 -> 30
-	49 -> 31
-	50 -> 32
-	50 -> 33
-	50 -> 34
-	51 -> 35
-	51 -> 36
-	51 -> 37
-	52 -> 38
-	52 -> 39
-	52 -> 40
-	53 -> 41
-	53 -> 42
-	53 -> 43
-	54 -> 44
-	54 -> 45
-	54 -> 46
-	54 -> 47
-	54 -> 48
-	54 -> 49
-	54 -> 50
-	54 -> 51
-	54 -> 52
-	54 -> 53
+	5 -> 4
+	6 -> 4
+	7 -> 4
+	8 -> 5
+	8 -> 6
+	8 -> 7
+	9 -> 8
 }            

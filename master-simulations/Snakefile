@@ -4,12 +4,12 @@ from python.edge_report import edge_report, consolidate_edge_reports
 from python.sum_stats_table import sum_stats_table
 from python.graph import sum_stats_graph
 from python.parse_nexus_tree import parse_nexus_file
+
 import itertools
 import os
 import datetime as dt
-#import json
 
-shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
+shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/home/sweaver/programming/hivtrace/node_modules/.bin:/usr/local/bin:$PATH; ")
 
 # use the time to organize runs
 time = str(dt.datetime.now()).split(' ')[0]
