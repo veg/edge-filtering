@@ -1,4 +1,0 @@
-Unlike compartmental models simulating population averages, individualbased models (IBMs) keep track of the events that happen to each individual separately, and are therefore able to take into
-account various sources of individual heterogeneity.
-
-
