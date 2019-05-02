@@ -1,0 +1,171 @@
+## import all functions from python ## 
+from python.temp import *
+from python.edge_report import edge_report, consolidate_edge_reports
+from python.sum_stats_table import sum_stats_table
+from python.graph import sum_stats_graph
+from python.parse_nexus_tree import parse_nexus_file
+from python.remove_spaces import remove_spaces
+
+import itertools
+import os
+import datetime as dt
+
+shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/home/sweaver/programming/hivtrace/node_modules/.bin:/usr/local/bin:$PATH; ")
+
+# use the time to organize runs
+time = str(dt.datetime.now()).split(' ')[0]
+
+# size of the networks to create #
+network_sizes = list(range(3, 21))
+#network_sizes = list([20])
+
+# Evolution parameters #
+    #within host Ev #
+TIP_LENGTH = 0
+    #between host Ev #
+INTERNAL_LENGTH = 0.05
+FORMAT = "hyphy"
+
+# number of simulations #
+sims = 10
+number_of_sims = [[i]*sims for i in network_sizes]
+flatten = [j for i in number_of_sims for j in i]
+
+INDEX = []
+for i in number_of_sims:
+    for pos, item in enumerate(i):
+        INDEX.append(str(pos))
+
+PAIRS = list(zip(flatten,INDEX))
+temp = [str(p[0])+'_'+p[1] for p in PAIRS]
+
+simpact_files = ["C.Epidemic"]
+
+hivtrace_temps = temp + simpact_files
+
+rule all: 
+    params: 
+        runtime="5:00:00"
+    input:        
+        "data/summary_statistics_FDR_graph.png",
+        "data/summary_statistics_TDR_graph.png",
+        "data/summary_statistics_funnel_graph.png",
+        "data/summary_statistics_sqrt_funnel_graph.png",
+        "data/all_edge_report.json"
+        #"data/summary_statistics_table.csv"
+
+rule simpact:
+    params:
+        runtime="5:00:00"
+    input:
+        [os.path.join(os.getcwd(), "simulate/" + x + ".nwk") for x in simpact_files]
+
+    output:
+        expand("data/seq_gen/{config}.fas", config=simpact_files)
+    group:"matrix_generation"
+    shell:  
+        "HYPHYMP simulate/SimulateSequenceFromTree.bf {input} > {output}"
+
+#rule simpact:
+#    params:
+#        runtime="5:00:00",
+#    input:
+#        fasta = [os.path.join(os.getcwd(), "./simulate/{0}.fas").format(x) for x in simpact_files]
+#    output:
+#        expand("data/simpact/{simpact_file}.fixed.fas", simpact_file=simpact_files)
+#    group:"matrix_generation"
+#    run:
+#        remove_spaces(input.fasta, output)
+
+## this rule will take the generated fasta files and input them into HIVtrace 
+rule hiv_trace_with_edge_filtering:
+    params:
+        runtime="5:00:00"
+    input:
+        rules.simpact.output
+    output:
+        expand("data/hivtrace/{config}_nodes.results.json", config=simpact_files), expand("data/hivtrace/{config}_nodes.results.log", config=simpact_files)
+    group:"hivtrace"
+    shell:
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]}"
+
+## this rule will take the generated fasta files and input them into HIVtrace 
+rule hiv_trace_without_edge_filtering:
+    params:
+        runtime="5:00:00"
+    input:
+        rules.simpact.output
+    output:
+        expand("data/hivtrace/{config}_nodes.nofilter.results.json", config=simpact_files), expand("data/hivtrace/{config}_nodes.nofilter.results.log", config=simpact_files)
+    group:"hivtrace"
+    shell:
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]} "
+
+## this rule will take the generated fasta files and input them into HIVtrace 
+rule hiv_trace_with_cycle_filtering:
+    params:
+        runtime="5:00:00"
+    input:
+        rules.simpact.output
+    output:
+        expand("data/hivtrace/{config}_nodes.cycle.results.json", config=simpact_files), expand("data/hivtrace/{config}_nodes.cycle_report.json",config=simpact_files), expand("data/hivtrace/{config}_nodes.cycle.results.log",config=simpact_files)
+    group:"hivtrace"
+    shell:
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]} --log {output[2]}"
+
+
+rule generate_edge_report:
+    params:
+        runtime="5:00:00"
+    input:
+        with_edge_filtering=rules.hiv_trace_with_edge_filtering.output,
+        with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output,
+        with_cycle_filtering=rules.hiv_trace_with_cycle_filtering.output,
+        transmission_chains=[os.path.join(os.getcwd(), "./simulate/{0}_edge_list.csv").format(x) for x in simpact_files]
+    output:
+        expand("data/hivtrace/{config}_edge_report.json", config=simpact_files)
+    group:"report"
+    run:
+        pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, [input.with_cycle_filtering[0]], [input.with_cycle_filtering[1]], input.transmission_chains, output)
+        for p in pairs:
+            edge_report(*p)
+
+
+### this rule consumes all the edge reports and creates a table with all the info ##
+#rule generate_all_edge_report:
+#    params:
+#        runtime="5:00:00"
+#    input:
+#        expand("data/hivtrace/{config}_edge_report.json", config=simpact_files)
+#    output:
+#        "data/all_edge_report.json"
+#    group:"report"
+#    run:
+#        consolidate_edge_reports(simpact_files, input, output[0])
+
+#rule summary_stats_table:
+#    params:
+#        runtime="5:00:00"
+#    input:
+#        expand("data/hivtrace/{config}_edge_report.json", config=simpact_files)
+#    output:
+#        "data/summary_statistics_table.csv"
+#    group:"report"
+#    run:
+#        sum_stats_table(input, output, sims)
+
+### this rule consumes all the edge reports and creates FDR, TDR, and funnel graphs with all the info ##
+#rule summary_stats_graph:
+#    params:
+#        runtime="5:00:00"
+#    input:
+#        rules.summary_stats_table.output
+#    output:
+#        "data/summary_statistics_FDR_graph.png",
+#        "data/summary_statistics_TDR_graph.png",
+#        "data/summary_statistics_funnel_graph.png",
+#        "data/summary_statistics_sqrt_funnel_graph.png"
+#    group:"report"
+#    run:
+#        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
+
