@@ -6,7 +6,8 @@ from python.graph import sum_stats_graph
 import itertools
 import os
 import datetime as dt
-#import json
+import numpy as np
+
 
 shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
 
@@ -14,14 +15,15 @@ shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.
 time = str(dt.datetime.now()).split(' ')[0]
 
 # size of the networks to create #
-network_sizes = list(range(5, 6))
+network_sizes = list([8])
 #network_sizes = list([20])
 
 # Evolution parameters #
-    #within host Ev #
-TIP_LENGTH = 0
-    #between host Ev #
-INTERNAL_LENGTH = 0.05
+# within host Ev #
+TIP_LENGTH = list(np.arange(0.01, 0.2, 0.01))
+
+# between host Ev #
+INTERNAL_LENGTH = list(np.arange(0.01, 0.2, 0.01))
 FORMAT = "hyphy"
 
 # number of simulations #
@@ -36,8 +38,7 @@ for i in number_of_sims:
 
 PAIRS = list(zip(flatten,INDEX))
 temp = [str(p[0])+'_'+p[1] for p in PAIRS]
-
-
+temp = ['{}_{:.2f}_{:.2f}'.format(*x) for x in itertools.product(temp, INTERNAL_LENGTH, TIP_LENGTH)]
 
 rule all: 
     params: 
@@ -60,11 +61,13 @@ rule matrix_for_BF:
         expand(os.path.join(os.getcwd(),"data/matrix/{temp}_nodes.ibf"), temp=temp)
     group:"matrix_generation"
     run:
-        #import pdb; pdb.set_trace()
         for pair in zip(params.temp,output):
-            node = pair[0].split('_')[0]
+            tokens = pair[0].split('_')
+            node = tokens[0]
+            internal_length = float(tokens[2])
+            tip_length = float(tokens[3])
             output_fn = pair[1]
-            edge_creator(INTERNAL_LENGTH, TIP_LENGTH, node, FORMAT, output_fn)
+            edge_creator(internal_length, tip_length, node, FORMAT, output_fn)
 
 ## this rule will take the matrices and input them into the sim_seq.bf to make fasta files ##
 rule seq_gen:
@@ -132,14 +135,6 @@ rule generate_edge_report:
         for p in pairs:
             edge_report(*p)
 
-
-# rule emvolz_sim:
-#     input:
-#         "londonMSM_tree_simulator/model1.R"        
-#     output:
-
-#     script:
-#         "{input}"
 
 ## this rule consumes all the edge reports and creates a table with all the info ##
 rule generate_all_edge_report:
