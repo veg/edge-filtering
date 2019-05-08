@@ -3,10 +3,12 @@ from python.temp import *
 from python.edge_report import edge_report, consolidate_edge_reports
 from python.sum_stats_table import sum_stats_table
 from python.graph import sum_stats_graph
+import multiprocessing
 import itertools
 import os
 import datetime as dt
 import numpy as np
+from snakemake.utils import read_job_properties
 
 
 shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
@@ -15,19 +17,18 @@ shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.
 time = str(dt.datetime.now()).split(' ')[0]
 
 # size of the networks to create #
-network_sizes = list([8])
-#network_sizes = list([20])
+network_sizes = list([6,7,8,9,10])
 
 # Evolution parameters #
 # within host Ev #
-TIP_LENGTH = list(np.arange(0.01, 0.2, 0.01))
+TIP_LENGTH = list(np.arange(0.01, 0.3, 0.01))
 
 # between host Ev #
-INTERNAL_LENGTH = list(np.arange(0.01, 0.2, 0.01))
+INTERNAL_LENGTH = list(np.arange(0.01, 0.3, 0.01))
 FORMAT = "hyphy"
 
 # number of simulations #
-sims = 1
+sims = 10
 number_of_sims = [[i]*sims for i in network_sizes]
 flatten = [j for i in number_of_sims for j in i]
 
@@ -39,6 +40,15 @@ for i in number_of_sims:
 PAIRS = list(zip(flatten,INDEX))
 temp = [str(p[0])+'_'+p[1] for p in PAIRS]
 temp = ['{}_{:.2f}_{:.2f}'.format(*x) for x in itertools.product(temp, INTERNAL_LENGTH, TIP_LENGTH)]
+
+def edge_create(pair):
+  tokens = pair[0].split('_')
+  node = tokens[0]
+  internal_length = float(tokens[2])
+  tip_length = float(tokens[3])
+  output_fn = pair[1]
+  edge_creator(internal_length, tip_length, node, FORMAT, output_fn)
+
 
 rule all: 
     params: 
@@ -59,15 +69,10 @@ rule matrix_for_BF:
         runtime="5:00:00"
     output: 
         expand(os.path.join(os.getcwd(),"data/matrix/{temp}_nodes.ibf"), temp=temp)
-    group:"matrix_generation"
     run:
-        for pair in zip(params.temp,output):
-            tokens = pair[0].split('_')
-            node = tokens[0]
-            internal_length = float(tokens[2])
-            tip_length = float(tokens[3])
-            output_fn = pair[1]
-            edge_creator(internal_length, tip_length, node, FORMAT, output_fn)
+        cpu_count = snakemake.available_cpu_count()
+        with multiprocessing.Pool(cpu_count) as p:
+          p.map(edge_create, zip(params.temp,output))
 
 ## this rule will take the matrices and input them into the sim_seq.bf to make fasta files ##
 rule seq_gen:
@@ -77,7 +82,7 @@ rule seq_gen:
         os.path.join(os.getcwd(), "data/matrix/{temp}_nodes.ibf")
     output:
         "data/sim_seq/{temp}_sim.fasta"
-    group:"matrix_generation"
+    group:"hivtrace"
     shell:  
         "HYPHYMP simulate/SimulateSequence.bf {input} > {output}"
 
