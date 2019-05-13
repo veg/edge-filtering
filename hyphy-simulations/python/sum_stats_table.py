@@ -65,7 +65,10 @@ def sum_stats_table(input, output, sims):
         TP = edges_removed
         ER_avg = sum(edges_removed)/len(edges_removed)
         FN = spurious_still_remaining
-        FNR = [int(a) / (int(a) + int(b)) for a,b in zip(FN, TP)]
+        try:
+            FNR = [int(a) / (int(a) + int(b)) for a,b in zip(FN, TP)]
+        except:
+            FNR = [0 for a,b in zip(FN, TP)]
 
         # FPR = FP/ (FP + TN)
         FP = wrongfully_purged_edges

@@ -11,7 +11,7 @@ import numpy as np
 from snakemake.utils import read_job_properties
 import random
 
-shell.prefix("export PATH=/usr/local/bin:$PATH; ")
+shell.prefix("source /opt/edge-filtering/edge/bin/activate;module load aocc/1.2.1;export PATH=/usr/local/bin:$PATH; ")
 
 pid = str(config["seed"])
 
@@ -26,11 +26,10 @@ network_sizes = list([config["chain_size"]])
 
 # Evolution parameters #
 # within host Ev #
-TIP_LENGTH = list(np.arange(0.001, 0.015, 0.001))
-#TIP_LENGTH = [0]
+#TIP_LENGTH = list(np.arange(0.01, 0.15, 0.01))
 
 # between host Ev #
-INTERNAL_LENGTH = list(np.arange(0.001, 0.015, 0.001))
+#INTERNAL_LENGTH = list(np.arange(0.01, 0.15, 0.01))
 FORMAT = "hyphy"
 
 # number of simulations #
@@ -45,19 +44,13 @@ for i in number_of_sims:
 
 PAIRS = list(zip(flatten,INDEX))
 temp = [str(p[0])+'_'+p[1] for p in PAIRS]
-
-items = itertools.product(temp, INTERNAL_LENGTH, TIP_LENGTH)
-items = list(filter(lambda x: x[1] + x[2] < 0.014, items))
-temp = ['{}_{:.3f}_{:.3f}'.format(*x) for x in items]
+temp = ['{}'.format(*x) for x in temp]
 
 def edge_create(pair):
   tokens = pair[0].split('_')
   node = tokens[0]
-  internal_length = float(tokens[2])
-  tip_length = float(tokens[3])
   output_fn = pair[1]
-  edge_creator(internal_length, tip_length, node, FORMAT, output_fn)
-
+  edge_creator_dist(node, FORMAT, output_fn)
 
 rule all: 
     params: 
@@ -144,7 +137,7 @@ rule generate_edge_report:
         pid + "/data/hivtrace/{temp}_edge_report.json"
     group:"report"
     run:
-        transmission_chains=[matrix_maker(INTERNAL_LENGTH,TIP_LENGTH,config['chain_size']) for n in input.with_edge_filtering]
+        transmission_chains=[matrix_maker_dist(config['chain_size']) for n in input.with_edge_filtering]
         pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, [input.with_cycle_filtering[0]], [input.with_cycle_filtering[1]], transmission_chains, output)
         for p in pairs:
             edge_report(*p)
@@ -186,5 +179,5 @@ rule summary_stats_graph:
         pid + "/data/summary_statistics_sqrt_funnel_graph.png"
     group:"report"
     run:
-        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
+        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, 0, 0)
 

@@ -1,8 +1,28 @@
 import pandas as pd
+import scipy.stats
 import argparse
 import os
 
 dirname = os.path.dirname(os.path.realpath(__file__))
+rv = scipy.stats.beta(2.6711811991141117, 0.9048171772138711, -0.00148892720428367, 0.016488927204283674)
+
+def matrix_maker_dist(matrix_node_count):
+    #print('\n         generating the matrix... \n' )
+    nodes = list(range(int(matrix_node_count)))
+    ## payload for column 1 (node ID) ##
+    j = [i +1 for i in nodes]
+    #print('Total number of  nodes in the network: ' + str(j[-1]) + '\n')
+
+    ## payload for column 2 (source nodes) ##
+    nodes[0] = -1
+
+    ## payload for columns 3 ( internal length) and 4 (tip length) ##
+    temp_internal = [rv.rvs() for i in nodes]
+    temp_tip = [0.0 for i in nodes]
+    #print(len(j), len(nodes), len(temp_internal), len(temp_tip))
+    d = {'Node ID': j, 'Source Node': nodes, 'Internal Length': temp_internal, 'Tip Length':temp_tip}
+    df = pd.DataFrame(d)
+    return df
 
 def matrix_maker(internal, tip, matrix_node_count):
     #print('\n         generating the matrix... \n' )
@@ -15,12 +35,13 @@ def matrix_maker(internal, tip, matrix_node_count):
     nodes[0] = -1
 
     ## payload for columns 3 ( internal length) and 4 (tip length) ##
-    temp_internal = [0.005 for i in nodes]
-    temp_tip = [0 for i in nodes]
+    temp_internal = [internal for i in nodes]
+    temp_tip = [tip for i in nodes]
     #print(len(j), len(nodes), len(temp_internal), len(temp_tip))
     d = {'Node ID': j, 'Source Node': nodes, 'Internal Length': temp_internal, 'Tip Length':temp_tip}
     df = pd.DataFrame(d)
     return df
+
 
 def matrix_writer(matrix, format, output_fn):
     #print('\n         writing the matrix to a file... \n' )
@@ -55,6 +76,12 @@ def matrix_writer(matrix, format, output_fn):
 
     else:
         raise Exception('invalid format you POS!')
+
+def edge_creator_dist(matrix_node_count, format, output_fn):
+    results = matrix_maker_dist(matrix_node_count)
+    matrix_writer(results, format, output_fn)
+    return results
+
 
 def edge_creator(internal_length, tip_length, matrix_node_count, format, output_fn):
     results = matrix_maker(internal_length,tip_length,matrix_node_count)

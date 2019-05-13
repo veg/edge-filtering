@@ -1,0 +1,1 @@
+/home/sweaver/programming/hivtrace/edge/bin/hivnetworkcsv -i raw_reference.fas_user.tn93output.csv -t .015 -f plain -j -o -n remove -s raw_reference.fas_output.fasta -l --cycle-report-file ./LANL.cycle_report.json > cycles.json
