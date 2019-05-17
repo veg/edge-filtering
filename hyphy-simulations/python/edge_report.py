@@ -89,7 +89,11 @@ def edge_report(results_json, no_filter_json, cycle_json, cycle_report, transmis
 
     # Only read the first line of the cycle report
     with open(cycle_report) as f:
-        cycle_report = json.loads(f.readline())
+        try:
+            cycle_report = json.loads(f.readline())
+        except:
+            cycle_report = {}
+            cycle_report["cycles"] = {}
 
     results = results["trace_results"]
     no_filter_results = no_filter_results["trace_results"]
