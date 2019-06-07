@@ -1,0 +1,9 @@
+Due to a mix-up, some of the files originally uploaded in Februrary were sampled only during a period of 3 years, rather than 5. The files in this sub-Folder are the ones originally uploaded, with the exception of runs 2, 3, 5, and 8, which have been replaced with datasets sampled over a 3-year period.
+
+PLEASE DO NOT USE THESE FILES FOR ANY NEW ANALYSES, UNLESS COMPARING THE EFFECT OF SAMPLING DURATION ON RUNS 9-12!
+
+
+We strongly recommend disregarding any analyses on sequence datasets 1 and 4 using the original datasets, due to fears that the sampling period could /possibly/ affect these sequence-based analyses more severly. Datasets 2 and 3 are unaffected.
+
+
+PLEASE USE ONLY THE 5-YEAR SAMPLED FILES FOR ALL NEW ANALYSES!

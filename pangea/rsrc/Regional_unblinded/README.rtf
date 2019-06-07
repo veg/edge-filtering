@@ -1,0 +1,45 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1347\cocoasubrtf570
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww18000\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 ##############################################################\
+#	FILE INFO FOR the regional simulations that were used in the PANGEA_HIV methods comparison exercise\
+#	Oliver Ratmann 03.09.2015\
+##############################################################\
+\
+
+\b File \'93answers_Regional_Feb2015_rFormat.csv\'94 contains 
+\b0 \
+\
+- the true values for the primary objectives,\
+- keys that relate the blinded scenarios to the unblinded data files.\
+\
+
+\b The *.R data files contain for each simulated scenario
+\b0 :\
+\
+- df.epi		a data table describing the simulated HIV epidemic by year   \
+- df.trms		a data table of all transmission events\
+- df.inds		a data table of individual level variables  \
+- df.sample	same as \'93df.epi\'94 but with number of sequences sampled per year \
+- df.seq		data table containing the simulated sequences   \
+- df.sp		data table describing the results of the seroprevalence surveys\
+\
+Please load the data.table R package before opening the data files.\
+\
+
+\b Simulations
+\b0 \
+\
+The rPANGEAHIV R package was used simulate sequences and to create the R data files. The source code is available here\
+{\field{\*\fldinst{HYPERLINK "https://github.com/PangeaHIV/HPTN071sim/tree/master/source"}}{\fldrslt https://github.com/PangeaHIV/HPTN071sim/tree/master/source}}\
+\
+The input to this R package is a line list of transmission events and a list of individual level variables. The input files are provided as .csv files. This line list is an output of\
+a version of the HPTN071 transmission and intervention model that was adapted for PANGEA_HIV.\
+\
+Please note: \
+- a previous version of the R package did not set the seed of the VirusTreeSimulator subprogram. As a result, when the R package is re-run, output will unfortunately differ slightly from the available R data files.\
+\
+}

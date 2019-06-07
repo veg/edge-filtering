@@ -1,0 +1,79 @@
+#############################################################################
+########       About the Extended Village Information Release        ########
+#############################################################################
+
+Note that Villages 1&6, 2&8, 3&5, and 4&7 are identical simulations, the only 
+difference being that villages 1-4 were sampled at 25% and given as sequences,
+and villages 5-8 were sampled at 50% and given as trees. 
+[The villages were actually sampled at 75% and then 1/3 of this used as the 
+25% sample and 2/3 used as the 50% sample, so that no samples overlap between
+the two data sets.]
+
+'25%' ('50%') means that 25% (50%) of the total number of individuals infected 
+and alive at any time between the start of year 40 and the end of year 44 were 
+sampled. The individuals to be sampled were selected first and then the sample 
+times randomized (realistically - only when the individual was alive and 
+infected) through the sampling time. 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~                 Notes on Data Presentation                  ~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Villages 1&6, 2&8, 3&5, and 4&7 contain sampling/sequence coverage for both 
+the 25% (villages 1-4) and 50% (villages 5-8) samplings
+
+* All values are for the *END OF* the year value (e.g. - number of individuals 
+infected at the end of 0.5 years)
+
+* All simulations start with 1 infected female, so number of infected females 
+in the first 0.5 year is always 1 less than the number of new female 
+infections in the first 0.5 year
+
+* All male/female values are for the gender of the *infected* individual - not
+the gender of the transmitter. For example, the percNewInfectFromAcute.Female
+is the proportion of females infected that were infected while their 
+transmitter (of male gender - no same-sex transmission) was in the acute 
+stage. 
+
+* Unlike other values, sample/sequence coverage is a proportion of the *total*
+number of samples/sequences taken, to show any differences in sampling over
+time between men and women (designed to be sampled equally, differences are 
+due to other underlying causes in the simulation - e.g. more of one gender 
+infected than the other)
+
+* Some population-level numbers like overall prevalence and incidence haven't
+been included but can be calculated from summing male and female values 
+provided
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~                          Definitions                        ~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+endYear		- values are for the time between the previous row and and this value
+
+alive.Female	- total number of females alive
+alive.Male		- total number of males alive
+
+infected.Female	- total number of females infected with HIV
+infected.Male	- total number of males infected with HIV
+
+newInfections.Female	- number of new infections in females in this time period
+newInfections.Male		- number of new infections in males in this time period
+
+prevalence.Female	- total number infected females / total number alive females * 100
+prevalence.Male		- total number infected males / total number alive males * 100
+
+incidence.Female	- number of new infections in females / number of susceptible females * 100
+incidence.Male		- number of new infections in males / number of susceptible males * 100
+
+percInfectedTreated.Female	- number of infected females on treatment / number of females infected * 100
+percInfectedTreated.Male	- number of infected males on treatment / number of males infected * 100
+
+percNewInfectFromAcute			- number of new infections from partner in acute stage / number of new infections * 100
+percNewInfectFromAcute.Female	- number of new infections in females from partner in acute stage / number of new infections in females * 100
+percNewInfectFromAcute.Male		- number of new infections in males from partner in acute stage / number of new infections in males * 100
+
+sampleCoverage.25p			- cumulative number of samples taken up to this time period / total number of individuals infected and alive between start of 40 and end of 44 * 100
+sampleCoverage.25p.Female	- cumulative number of samples taken in females up to this time period / total number of individuals infected and alive between start of 40 and end of 44 * 100
+sampleCoverage.25p.Male		- cumulative number of samples taken in males up to this time period / total number of individuals infected and alive between start of 40 and end of 44 * 100
+

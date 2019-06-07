@@ -1,0 +1,43 @@
+#############################################################################
+########          About the Village R0 Information Release           ########
+#############################################################################
+
+Note that Villages 1&6, 2&8, 3&5, and 4&7 are identical simulations, the only 
+difference being that villages 1-4 were sampled at 25% and given as sequences,
+and villages 5-8 were sampled at 50% and given as trees. 
+
+To show R0 over time, individuals were grouped into two-year periods by when
+they were infected. For example, all individuals infected between year 0 and
+the end of year 1 were grouped together. Then, the mean R0 of all these
+individuals was calculated. 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~                 Notes on Data Presentation                  ~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Overall R0 was calculated, then the data was further broken down to 
+calculate R0 for sex workers and high- and low-risk members of 2 person 
+households, then to the males and females of high- and -low risk households.
+
+* The effect of treatment can be seen *before* year 40, as individuals 
+infected before year 40 can get treated at year 40 and have lower R0.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~                          Definitions                        ~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+InfectedIn.Year.Range	- Shows the range during which individuals were 
+	infected, by which their R0's were grouped
+Inf.Year				- Shows a simple year value for plotting, etc.
+
+R0.All	- R0 of all sex workers and people in 2-person households (whole focal population)
+
+R0.SexWorkers	- R0 of sex workers only (all female)
+R0.LowRisk		- R0 of male and female individuals in low-risk households
+R0.HighRisk 	- R0 of male and female individuals in high-risk households
+
+R0.LowRisk.Female	- R0 of female individuals in low-risk households
+R0.LowRisk.Male		- R0 of male individuals in low-risk households
+R0.HighRisk.Female	- R0 of female individuals in high-risk households
+R0.HighRisk.Male	- R0 of male individuals in high-risk households
