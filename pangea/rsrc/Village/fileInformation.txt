@@ -1,8 +1,15 @@
-Due to a mix-up, some of the files originally uploaded in Februrary were sampled only during a period of 3 years, rather than 5. The files now present in this folder have samples over 5 years.
+Due to a mix-up, some of the files originally uploaded in Februrary were sampled
+only during a period of 3 years, rather than 5. The files now present in this
+folder have samples over 5 years.
+
 Runs 2, 3, 5, and 8 were unaffected, and are the same as originally uploaded.
 
-We strongly recommend disregarding any analyses on sequence datasets 1 and 4, due to fears that the sampling period could /possibly/ affect these analyses more severly. Datasets 2 and 3 are unaffected.
+We strongly recommend disregarding any analyses on sequence datasets 1 and 4,
+due to fears that the sampling period could /possibly/ affect these analyses
+more severly. Datasets 2 and 3 are unaffected.
 
-The originally uploaded files are in sub-folder '3yrFiles' if needed. The exception is runs 2, 3, 5, and 8, which have been replaced with datasets where the sampling is done over a 3-year period.
+The originally uploaded files are in sub-folder '3yrFiles' if needed. The
+exception is runs 2, 3, 5, and 8, which have been replaced with datasets where
+the sampling is done over a 3-year period.
 
 PLEASE USE ONLY THE 5-YEAR SAMPLED FILES FOR ALL NEW ANALYSES!
