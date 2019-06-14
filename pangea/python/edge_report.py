@@ -1,5 +1,6 @@
 import json
 import csv
+from Bio import SeqIO
 
 def get_json(fn):
     with open(fn) as f:
@@ -17,16 +18,27 @@ def consolidate_edge_reports(pairs, input, output):
 
     return
 
-def get_transmissions(fn):
+def get_transmissions(fn, orig_fasta_fn):
     with open(fn) as trans_file:
+
         rows = [row for row in csv.DictReader(trans_file)]
+
+        # Drop all edges that contain sequences that are not part of the MSA
+        with open(orig_fasta_fn) as orig_fasta:
+            sequences = list(SeqIO.parse(orig_fasta, "fasta"))
+
+        ids = [st.id for st in sequences]
+        rows = [ row for row in rows if row["FromDeme.FromHost"] in ids and row["ToDeme.ToHost"] in ids]
+        rows = [ row for row in rows if row["FromDeme.FromHost"] != row["ToDeme.ToHost"]]
+        print(len(rows))
+
         return rows
 
-def generate_edge_report(test_filter_results, no_filter_results, transmission_chain):
+def generate_edge_report(test_filter_results, no_filter_results, transmission_chain, orig_fasta):
 
     report = {}
 
-    transmission_chain = get_transmissions(transmission_chain)
+    transmission_chain = get_transmissions(transmission_chain, orig_fasta)
 
     # How many clusters are there?
     num_clusters = len(test_filter_results["Cluster sizes"])
@@ -84,7 +96,7 @@ def generate_edge_report(test_filter_results, no_filter_results, transmission_ch
 
     return report
 
-def edge_report(results_json, no_filter_json, cycle_json, cycle_report, transmission_chain, output_fn):
+def edge_report(results_json, no_filter_json, cycle_json, cycle_report, transmission_chain, input_file, output_fn):
 
     ## has been filtered ##
     results = ''
@@ -101,20 +113,19 @@ def edge_report(results_json, no_filter_json, cycle_json, cycle_report, transmis
     with open(cycle_json) as f:
         filter_cycle_results = json.loads(f.read())
 
-    # # Only read the first line of the cycle report
-    # with open(cycle_report) as f:
-    #     cycle_report = json.loads(f.readline())
+    # Only read the first line of the cycle report
+    with open(cycle_report) as f:
+        cycle_report = json.loads(f.readline())
 
     results = results["trace_results"]
     no_filter_results = no_filter_results["trace_results"]
     filter_cycle_results = filter_cycle_results["trace_results"]
 
     report = {}
-    report['filter-report'] = generate_edge_report(results, no_filter_results, transmission_chain)
+    report['filter-report'] = generate_edge_report(results, no_filter_results, transmission_chain, input_file)
 
-    import pdb; pdb.set_trace()
     report['cycles'] = cycle_report['cycles']
-    report['cycle-report'] = generate_edge_report(filter_cycle_results, no_filter_results, transmission_chain)
+    report['cycle-report'] = generate_edge_report(filter_cycle_results, no_filter_results, transmission_chain, input_file)
 
     with open(output_fn, 'w') as jsonfile:
         json.dump(report, jsonfile)

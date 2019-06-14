@@ -23,6 +23,8 @@ def generate_edge_report(test_filter_results, no_filter_results, transmission_ch
     # How many clusters are there?
     num_clusters = len(test_filter_results["Cluster sizes"])
 
+    raw_num_edges = no_filter_results["Network Summary"]["Edges"]
+
     num_edges = test_filter_results["Network Summary"]["Edges"]
     num_nodes = test_filter_results["Network Summary"]["Nodes"]
 
@@ -32,7 +34,9 @@ def generate_edge_report(test_filter_results, no_filter_results, transmission_ch
 
     ## so FP = edges that WERE removed PLUS spurious edges that still persist.
     ## because both of these types of edges WERE NOT in the original CT.
-    num_edges_removed = no_filter_results["Network Summary"]["Edges"] - num_edges
+    num_edges_removed = raw_num_edges - num_edges
+
+    report['raw_num_edges'] = raw_num_edges
 
     report['num_edges'] = num_edges
     report['num_nodes'] = num_nodes

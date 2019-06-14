@@ -18,6 +18,8 @@ time = str(dt.datetime.now()).split(' ')[0]
 # size of the networks to create #
 network_sizes = list(range(3, 21))
 
+threshold = 0.022
+reference = "./rsrc/ref.fasta"
 
 all_transmission_files = [
         "Transmission-Lists/Vill_00_lineList.csv",
@@ -47,10 +49,10 @@ rule all:
     params: 
         runtime="5:00:00"
     input:        
-        "data/summary_statistics_FDR_graph.png",
-        "data/summary_statistics_TDR_graph.png",
-        "data/summary_statistics_funnel_graph.png",
-        "data/summary_statistics_sqrt_funnel_graph.png",
+        #"data/summary_statistics_FDR_graph.png",
+        #"data/summary_statistics_TDR_graph.png",
+        #"data/summary_statistics_funnel_graph.png",
+        #"data/summary_statistics_sqrt_funnel_graph.png",
         "data/all_edge_report.json"
 
 rule pangea:
@@ -74,7 +76,7 @@ rule hiv_trace_with_edge_filtering:
         expand("data/hivtrace/{config}_nodes.results.json", config=pangea_files), expand("data/hivtrace/{config}_nodes.results.log", config=pangea_files)
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r {reference} -t {threshold} -m 500 -g .05 -o {output[0]} --log {output[1]}"
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_without_edge_filtering:
@@ -86,7 +88,7 @@ rule hiv_trace_without_edge_filtering:
         expand("data/hivtrace/{config}_nodes.nofilter.results.json", config=pangea_files), expand("data/hivtrace/{config}_nodes.nofilter.results.log", config=pangea_files)
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --log {output[1]} "
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -r {reference} -t {threshold} -m 500 -g .05 -o {output[0]} --log {output[1]} "
 
 ## this rule will take the generated fasta files and input them into HIVtrace 
 rule hiv_trace_with_cycle_filtering:
@@ -98,7 +100,7 @@ rule hiv_trace_with_cycle_filtering:
         expand("data/hivtrace/{config}_nodes.cycle.results.json", config=pangea_files), expand("data/hivtrace/{config}_nodes.cycle_report.json",config=pangea_files), expand("data/hivtrace/{config}_nodes.cycle.results.log",config=pangea_files)
     group:"hivtrace"
     shell:
-        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r HXB2_prrt -t .015 -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]} --log {output[2]}"
+        "hivtrace --do-not-store-intermediate -i {input} -a resolve -f remove -r {reference} -t {threshold} -m 500 -g .05 -o {output[0]} --filter-cycles --cycle-report-fn {output[1]} --log {output[2]}"
 
 
 rule generate_edge_report:
@@ -108,13 +110,13 @@ rule generate_edge_report:
         with_edge_filtering=rules.hiv_trace_with_edge_filtering.output,
         with_out_edge_filtering=rules.hiv_trace_without_edge_filtering.output,
         with_cycle_filtering=rules.hiv_trace_with_cycle_filtering.output,
-        #transmission_chains=[os.path.join(os.getcwd(), "./{0}_edge_list.csv").format(x) for x in pangea_files]
-        transmission_chains=[os.path.join(os.getcwd(), "./{0}").format(x) for x in transmission_files]
+        transmission_chains=[os.path.join(os.getcwd(), "./{0}").format(x) for x in transmission_files],
+        input_files=rules.pangea.output
     output:
         expand("data/hivtrace/{config}_edge_report.json", config=pangea_files)
     group:"report"
     run:
-        pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, [input.with_cycle_filtering[0]], [input.with_cycle_filtering[1]], input.transmission_chains, output)
+        pairs = zip(input.with_edge_filtering, input.with_out_edge_filtering, [input.with_cycle_filtering[0]], [input.with_cycle_filtering[1]], input.transmission_chains, input.input_files, output)
         for p in pairs:
             edge_report(*p)
 
@@ -129,31 +131,31 @@ rule generate_all_edge_report:
         "data/all_edge_report.json"
     group:"report"
     run:
-        consolidate_edge_reports(simpact_files, input, output[0])
+        consolidate_edge_reports(pangea_files, input, output[0])
 
-rule summary_stats_table:
-    params:
-        runtime="5:00:00"
-    input:
-        expand("data/hivtrace/{config}_edge_report.json", config=pangea_files)
-    output:
-        "data/summary_statistics_table.csv"
-    group:"report"
-    run:
-        sum_stats_table(input, output, sims)
+#rule summary_stats_table:
+#    params:
+#        runtime="5:00:00"
+#    input:
+#        expand("data/hivtrace/{config}_edge_report.json", config=pangea_files)
+#    output:
+#        "data/summary_statistics_table.csv"
+#    group:"report"
+#    run:
+#        sum_stats_table(input, output, sims)
 
-## this rule consumes all the edge reports and creates FDR, TDR, and funnel graphs with all the info ##
-rule summary_stats_graph:
-    params:
-        runtime="5:00:00"
-    input:
-        rules.summary_stats_table.output
-    output:
-        "data/summary_statistics_FDR_graph.png",
-        "data/summary_statistics_TDR_graph.png",
-        "data/summary_statistics_funnel_graph.png",
-        "data/summary_statistics_sqrt_funnel_graph.png"
-    group:"report"
-    run:
-        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
+### this rule consumes all the edge reports and creates FDR, TDR, and funnel graphs with all the info ##
+#rule summary_stats_graph:
+#    params:
+#        runtime="5:00:00"
+#    input:
+#        rules.summary_stats_table.output
+#    output:
+#        "data/summary_statistics_FDR_graph.png",
+#        "data/summary_statistics_TDR_graph.png",
+#        "data/summary_statistics_funnel_graph.png",
+#        "data/summary_statistics_sqrt_funnel_graph.png"
+#    group:"report"
+#    run:
+#        sum_stats_graph(input, output[0], output[1], output[2], output[3], sims, TIP_LENGTH, INTERNAL_LENGTH)
 
